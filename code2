@@ -1,0 +1,23 @@
+<section class="clearfix">
+  <div class="container webpage-container">
+		   <div class="header_line col-md-12 no-padding">
+						 <h2 class="home_ttl upper clearfix home_back_img woo_ttl">Projects List</h2>
+		   </div>
+		   <div class="projects_parts">
+		    
+			<?php 
+			
+			 $custom_meta_text_field = get_post_meta( get_the_ID(), 'single_repeter_group', true);
+
+				if ( $custom_meta_text_field ) {					
+
+					foreach ( $custom_meta_text_field as $custom_meta_text_field_values ) {
+						echo '<div class="project_part col-md-4 project_right_space clearfix"><h3>' . esc_html( $custom_meta_text_field_values['meta-box-text'] ) .'</h3></div>' . '<br />';
+					}
+				}
+		      
+			  ?>
+			  
+		   </div>
+  </div>
+</section>	   
