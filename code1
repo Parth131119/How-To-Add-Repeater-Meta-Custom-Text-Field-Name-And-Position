@@ -1,0 +1,121 @@
+/* FOR HOME PAGE ONLY */
+
+/* Add Meta Custom Text Field Name And Position*/
+
+function add_custom_meta_box()
+{
+	
+	$post_id = $_GET['post'] ? $_GET['post'] : $_POST['post_ID'] ;
+
+	// checks for post/page ID
+	if ($post_id == '9'){
+		
+         add_meta_box("demo-meta-box", "Project List", "custom_meta_box_markup", "page", "normal", "high", null);
+	 
+	}   
+   	 
+}
+add_action("add_meta_boxes", "add_custom_meta_box");
+
+
+/* Add Meta Custom Text Field  And Put Repeater*/
+
+function custom_meta_box_markup($post)
+{ 	
+
+      $single_repeter_group = get_post_meta($post->ID, 'single_repeter_group', true);    
+	
+	
+    ?>
+	
+	  <script type="text/javascript">
+		jQuery(document).ready(function( $ ){
+			$( '#add-row' ).on('click', function() {
+				var row = $( '.empty-row.custom-repeter-text' ).clone(true);
+				row.removeClass( 'empty-row custom-repeter-text' ).css('display','table-row');
+				row.insertBefore( '#repeatable-fieldset-one tbody>tr:last' );
+				return false;
+			});
+
+			$( '.remove-row' ).on('click', function() {
+				$(this).parents('tr').remove();
+				return false;
+			});
+		});
+
+	</script>
+	
+	<table id="repeatable-fieldset-one" width="100%">
+		<tbody>
+			<?php
+			if ( $single_repeter_group ) :
+				foreach ( $single_repeter_group as $field ) {
+					?>
+					<tr>
+					
+					<td><label>Project Name: </label><input type="text"  style="width:50%;" name="meta-box-text[]"  value="<?php if($field['meta-box-text'] != '') echo esc_attr( $field['meta-box-text'] ); ?>" placeholder="Project Name"></td>		
+					<td><a class="button remove-row" href="#1">Remove</a></td>
+					</tr>
+					<?php
+				}
+			else :
+				?>
+				<tr>					
+					<td><label>Project Name: </label><input type="text" style="width:50%;" name="meta-box-text[]" placeholder="Project Name"></td>
+					<td><a class="button  cmb-remove-row-button button-disabled" href="#">Remove</a></td>
+				</tr>
+			<?php endif; ?>
+			<tr class="empty-row custom-repeter-text" style="display: none">				
+				<td><label>Project Name: </label><input type="text" style="width:50%;" name="meta-box-text[]" placeholder="Project Name"></td>
+				<td><a class="button remove-row" href="#">Remove</a></td> 
+			</tr>
+			
+		</tbody>
+	</table>
+	<p><a id="add-row" class="button" href="#">Add another</a></p>
+	
+		
+       
+    <?php  
+}	
+
+
+/* Save Or Update Meta Custom Text Field */
+
+
+function save_custom_meta_box($post_id, $post, $update)
+{
+	
+	
+	$old = get_post_meta($post_id, 'single_repeter_group', true);
+
+	$new = array();
+	$meta_box_text = $_POST['meta-box-text'];
+	
+	$count = count( $meta_box_text );
+	for ( $i = 0; $i < $count; $i++ ) {
+		if ( $meta_box_text[$i] != '' ) {
+			$new[$i]['meta-box-text'] = stripslashes( strip_tags( $meta_box_text[$i] ) );			
+		}
+	}
+	
+   
+    if(!empty($new) && $new != $old)
+    {
+        //$meta_box_text_value = $_POST["meta-box-text"];
+		update_post_meta( $post_id, 'single_repeter_group', $new );
+    }   
+    //update_post_meta($post_id, "meta-box-text", $meta_box_text_value);
+    
+}
+
+add_action("save_post", "save_custom_meta_box", 10, 3);
+
+/* Remove Or Delete Meta Custom Text Field */
+
+function remove_custom_field_meta_box()
+{
+    remove_meta_box("postcustom", "post", "normal");
+}
+
+add_action("do_meta_boxes", "remove_custom_field_meta_box");   
